@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" class="transition duration-300">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us | CurrencyChronicle.in</title>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition duration-300 font-sans">
+  <header class="bg-blue-900 dark:bg-blue-800 text-white shadow">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">
+        <a href="index.html" class="hover:text-gray-300">CurrencyChronicle.in</a>
+      </h1>
+      <nav class="flex items-center space-x-6">
+        <a href="index.html" class="hover:text-gray-300">Home</a>
+        <a href="about.html" class="hover:text-gray-300">About</a>
+        <button id="darkToggleBtn" class="ml-4 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-1 rounded transition hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">
+          Toggle Dark Mode
+        </button>
+      </nav>
+    </div>
+  </header>
+  <main class="container mx-auto px-4 py-12">
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-10">
+      <h2 class="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-300">About CurrencyChronicle.in</h2>
+      <p class="mb-4">Founded in 2023, CurrencyChronicle.in delivers accurate and timely financial news, specializing in:</p>
+      <ul class="list-disc list-inside mb-4">
+        <li>Forex markets</li>
+        <li>Cryptocurrency trends</li>
+        <li>Commodities analysis</li>
+      </ul>
+      <p>Our team of experienced analysts brings you data-driven insights to navigate volatile markets.</p>
+    </section>
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-300">Our Brochure / Research Report</h2>
+      <div id="pdfContainer" class="relative w-full overflow-hidden rounded-md border border-gray-300 dark:border-gray-600 shadow-lg" style="padding-top: 56.25%;">
+        <embed 
+          id="pdfEmbed"
+          class="absolute top-0 left-0 w-full h-full"
+          type="application/pdf"
+          src="http://localhost:3000/latest-pdf">
+        </embed>
+      </div>
+      <div id="errorMessage" class="hidden mt-4 text-sm text-red-600 dark:text-red-400">
+        The PDF failed to load. Please try again later or contact support.
+      </div>
+      <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          If the PDF doesn’t load,
+          <a id="viewLink" href="http://localhost:3000/latest-pdf" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+            click here to view it manually
+          </a>.
+        </p>
+        <a id="downloadLink" href="http://localhost:3000/latest-pdf" 
+           class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm transition">
+          Download PDF
+        </a>
+      </div>
+    </section>
+    <section class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-10">
+      <h2 class="text-2xl font-semibold mb-4 text-blue-800 dark:text-blue-300minus-dark: text-blue-300">Upload New Brochure / Research Report</h2>
+      <form id="uploadForm" enctype="multipart/form-data" class="flex flex-col space-y-4">
+        <input 
+          type="file" 
+          id="pdfInput" 
+          name="pdf" 
+          accept="application/pdf" 
+          class="block w-full text-sm text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 focus:outline-none"
+          required>
+        <button 
+          type="submit" 
+          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm transition w-full sm:w-auto">
+          Upload PDF
+        </button>
+      </form>
+      <p id="uploadMessage" class="mt-4 text-sm text-gray-600 dark:text-gray-400 hidden"></p>
+    </section>
+  </main>
+  <footer class="bg-blue-900 dark:bg-blue-800 text-white text-center py-4">
+    <p>© 2023 CurrencyChronicle.in</p>
+  </footer>
+  <script>
+    const toggleBtn = document.getElementById('darkToggleBtn');
+    toggleBtn.addEventListener('click', () => {
+      const root = document.documentElement;
+      root.classList.toggle('dark');
+      localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      loadLatestPDF();
+    });
+
+    async function loadLatestPDF() {
+      try {
+        const response = await fetch('http://localhost:3000/latest-pdf');
+        if (!response.ok) {
+          throw new Error('Failed to fetch PDF');
+        }
+        const pdfEmbed = document.getElementById('pdfEmbed');
+        const viewLink = document.getElementById('viewLink');
+        const downloadLink = document.getElementById('downloadLink');
+        const errorMessage = document.getElementById('errorMessage');
+        const pdfUrl = 'http://localhost:3000/latest-pdf';
+        pdfEmbed.src = pdfUrl;
+        viewLink.href = pdfUrl;
+        downloadLink.href = pdfUrl;
+        errorMessage.classList.add('hidden');
+      } catch (err) {
+        console.error('Error loading PDF:', err);
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.classList.remove('hidden');
+      }
+    }
+
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadMessage = document.getElementById('uploadMessage');
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(uploadForm);
+      try {
+        const response = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          headers: { 'x-api-key': 'xyz123secret-7890-abcdef-4567-ghijklmnop' },
+          body: formData,
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Upload failed');
+        }
+        uploadMessage.textContent = result.message;
+        uploadMessage.classList.remove('hidden', 'text-red-600', 'dark:text-red-400');
+        uploadMessage.classList.add('text-green-600', 'dark:text-green-400');
+        await loadLatestPDF();
+        uploadForm.reset();
+      } catch (err) {
+        uploadMessage.textContent = `Error: ${err.message}`;
+        uploadMessage.classList.remove('hidden', 'text-green-600', 'dark:text-green-400');
+        uploadMessage.classList.add('text-red-600', 'dark:text-red-400');
+      }
+    });
+  </script>
+</body>
+</html>
