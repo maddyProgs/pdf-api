@@ -92,6 +92,21 @@ app.get('/latest-pdf', async (req, res) => {
   }
 });
 
+app.post('/fetch-google-drive-pdf', (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (apiKey !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}, async (req, res) => {
+  try {
+    await fetchGoogleDrivePDF();
+    res.json({ message: 'Google Drive PDF fetched and uploaded to database' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching Google Drive PDF', details: err.message });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'API is running' });
